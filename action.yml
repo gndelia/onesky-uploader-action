@@ -1,0 +1,33 @@
+name: 'OneSky File uploader'
+description: 'Upload resource files to the OneSky service'
+author: "Gonzalo D'Elia"
+inputs:
+  projectId:
+    description: 'ProjectId to which upload the file'
+    required: true
+  publicKey:
+    description: 'PublicKey from your OneSky account.'
+    required: true
+  privateKey:
+    description: 'PrivateKey from your OneSky account.'
+    required: true
+  filepath:
+    description: 'Path to the folder where your resource file is stored.'
+    required: true
+  filename:
+    description: 'Full name (with extension) of your resource file.'
+    required: true
+  locale:
+    description: 'Locale code of your resource file. Should match the ones listed here https://github.com/onesky/api-documentation-platform/blob/master/resources/locale.md#list---list-all-locales'
+    required: true
+  fileformat:
+    description: 'Specify the input format.'
+    required: false
+    default: 'IOS_STRINGS'
+  isKeepingAllStrings:
+    description: 'For strings that cannot be found in newly uploaded file with same file name, keep those strings unchange if set to true. Deprecate those strings if set to false. Notice that different files will not interfere each other in the same project. For example, with setting is_keeping_all_strings to false, uploading en2.po will not deprecate strings of previously uploaded file, en.po.'
+    required: false
+    default: 'true'
+runs:
+  using: 'node12'
+  main: 'lib/index.js'
