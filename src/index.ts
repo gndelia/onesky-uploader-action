@@ -41,7 +41,11 @@ function validateInputs() {
   }
 }
 
-type FileProcessStatus = 'completed' | 'in-progress' | 'failed'
+type ImportProcessStatusResponse = {
+  data: {
+    status: 'completed' | 'in-progress' | 'failed'
+  }
+}
 async function waitForImportFileProcess({
   projectId,
   fileUploadResponse,
@@ -68,24 +72,26 @@ async function waitForImportFileProcess({
         })
         console.log(`Checking import status of ${name} file, importId: ${id}`)
         const response = await fetch(url)
-        const json: { status: FileProcessStatus } = await response.json()
-        if (json.status === 'in-progress') {
+        const r: ImportProcessStatusResponse = await response.json()
+        console.log(r)
+        const { data } = r
+        if (data.status === 'in-progress') {
           console.log('Status: in-progress, rechecking in approximately 8 seconds...')
           // return, next interval will check again
           setTimeout(verify, POLLING_INTERVAL_MS)
           return
         }
-        if (json.status === 'completed') {
+        if (data.status === 'completed') {
           console.log(`${name} file processed successfully!`)
           resolve()
           return
         }
-        if (json.status === 'failed') {
+        if (data.status === 'failed') {
           console.log(`Failed to process ${name}, importId: ${id}`)
           // failed to process
           throw Error(`ImportId ${id} failed to be processed`)
         }
-        throw new Error('Unsupported status from OneSky Import API')
+        throw new Error(`Unsupported status from OneSky Import API: ${data.status}`)
       } catch (e) {
         reject(e)
       }
@@ -135,7 +141,9 @@ async function waitForImportFileProcess({
     const response = await fetch(requestUrl, { method: 'POST', body: form })
 
     const fileUploadResponse: FileUploadResponse = await response.json()
-    console.log(`Successfully started upload of ${filename}`)
+    console.log(
+      `Successfully started upload of ${filename}. Checking through the Import api the state of the upload...`
+    )
 
     await waitForImportFileProcess({ projectId, fileUploadResponse, privateKey, publicKey })
     console.log(`${filename} uploaded and imported successfully.`)
