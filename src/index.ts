@@ -9,6 +9,7 @@ import { addAuthInfo } from './auth'
 
 enum Status {
   OK = 201,
+  NOT_AUTHORIZED = 401,
 }
 
 type FileUploadResponse = {
@@ -42,6 +43,10 @@ function validateInputs() {
 }
 
 type ImportProcessStatusResponse = {
+  meta: {
+    status: Status
+    message: string
+  }
   data: {
     status: 'completed' | 'in-progress' | 'failed'
   }
@@ -72,9 +77,15 @@ async function waitForImportFileProcess({
         })
         console.log(`Checking import status of ${name} file, importId: ${id}`)
         const response = await fetch(url)
-        const r: ImportProcessStatusResponse = await response.json()
-        console.log(r)
-        const { data } = r
+        const json: ImportProcessStatusResponse = await response.json()
+        if (json.meta.status !== Status.OK) {
+          reject(
+            new Error(
+              `Failed to verify status of file with importId: ${id}. Status code response is ${json.meta.status}, error message: "${json.meta.message}"`
+            )
+          )
+        }
+        const { data } = json
         if (data.status === 'in-progress') {
           console.log('Status: in-progress, rechecking in approximately 8 seconds...')
           // return, next interval will check again
@@ -149,6 +160,6 @@ async function waitForImportFileProcess({
     console.log(`${filename} uploaded and imported successfully.`)
   } catch (e) {
     console.error(e)
-    core.setFailed(`Action failed with the error ${e.message}`)
+    core.setFailed(`Action failed with the error: ${e.message}`)
   }
 })()
