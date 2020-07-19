@@ -65,7 +65,7 @@ async function waitForImportFileProcess({
   const POLLING_INTERVAL_MS = 8000
   const { name } = fileUploadResponse.data
   const { id } = fileUploadResponse.data.import
-  const importUrl = `${OneSkyApiUrl}/projects/${projectId}/import-tasks/${id}`
+  const importUrl = `${OneSkyApiUrl}/projects/${projectId}/import-tasks/${id}?`
 
   return new Promise((resolve, reject) => {
     const verify = async () => {
