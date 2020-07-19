@@ -7,9 +7,16 @@ import FormData from 'form-data'
 import { OneSkyApiUrl } from './constants'
 import { addAuthInfo } from './auth'
 
+enum Status {
+  OK = 201,
+}
+
 type FileUploadResponse = {
-  name: string
-  import: { id: number }
+  meta: { status: Status }
+  data: {
+    name: string
+    import: { id: number }
+  }
 }
 
 function validateInputs() {
@@ -47,8 +54,8 @@ async function waitForImportFileProcess({
   publicKey: string
 }) {
   const POLLING_INTERVAL_MS = 8000
-  const { name } = fileUploadResponse
-  const { id } = fileUploadResponse.import
+  const { name } = fileUploadResponse.data
+  const { id } = fileUploadResponse.data.import
   const importUrl = `${OneSkyApiUrl}/projects/${projectId}/import-tasks/${id}`
 
   return new Promise((resolve, reject) => {
@@ -128,10 +135,10 @@ async function waitForImportFileProcess({
     const response = await fetch(requestUrl, { method: 'POST', body: form })
 
     const fileUploadResponse: FileUploadResponse = await response.json()
-    console.log(fileUploadResponse)
     console.log(`Successfully started upload of ${filename}`)
+
     await waitForImportFileProcess({ projectId, fileUploadResponse, privateKey, publicKey })
-    console.log(`${fileUploadResponse.name} uploaded and imported successfully.`)
+    console.log(`${filename} uploaded and imported successfully.`)
   } catch (e) {
     console.error(e)
     core.setFailed(`Action failed with the error ${e.message}`)
