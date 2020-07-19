@@ -7,13 +7,8 @@ import FormData from 'form-data'
 import { OneSkyApiUrl } from './constants'
 import { addAuthInfo } from './auth'
 
-enum Status {
-  OK = 201,
-  NOT_AUTHORIZED = 401,
-}
-
 type FileUploadResponse = {
-  meta: { status: Status }
+  meta: { status: number }
   data: {
     name: string
     import: { id: number }
@@ -44,7 +39,7 @@ function validateInputs() {
 
 type ImportProcessStatusResponse = {
   meta: {
-    status: Status
+    status: number
     message: string
   }
   data: {
@@ -78,7 +73,8 @@ async function waitForImportFileProcess({
         console.log(`Checking import status of ${name} file, importId: ${id}`)
         const response = await fetch(url)
         const json: ImportProcessStatusResponse = await response.json()
-        if (json.meta.status !== Status.OK) {
+        // if request isn't 2xx, it has failed
+        if (!json.meta.status.toString().startsWith('2')) {
           reject(
             new Error(
               `Failed to verify status of file with importId: ${id}. Status code response is ${json.meta.status}, error message: "${json.meta.message}"`
