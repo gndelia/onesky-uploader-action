@@ -42,4 +42,31 @@ None
 
 ## Example usage
 
-TBD
+Previously checkout your repository with
+
+```yml
+- name: Checkout
+  uses: actions/checkout@v2
+
+- name: Use Node.js 12.x
+  uses: actions/setup-node@v1
+  with:
+    node-version: '12.x'
+    registry-url: 'https://npm.pkg.github.com'
+```
+
+Then use this action with the following example 
+
+```yml
+- name: real upload
+  uses: gndelia/onesky-app-file-uploader-github-action@v0.0.1
+  with:
+    projectId: ${{ secrets.ONESKY_PROJECT_ID }} # projectId from OneSky stored in GH secrets
+    publicKey: ${{ secrets.ONESKY_PUBLIC_KEY }} # publicKey from OneSky stored in GH secrets
+    privateKey: ${{ secrets.ONESKY_PRIVATE_KEY }} # privateKey from OneSky stored in GH secrets
+    filepath: path/to/folder/where/the/file/is # Do not include the filename here
+    filename: my-file.json # filename
+    locale: en-US
+    fileformat: HIERARCHICAL_JSON
+    isKeepingAllStrings: false
+```

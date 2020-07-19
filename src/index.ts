@@ -1,11 +1,19 @@
 import * as core from '@actions/core'
 import fetch from 'node-fetch'
 import { promisify } from 'util'
-import { resolve } from 'path'
+import { join } from 'path'
 import { readFile } from 'fs'
 import FormData from 'form-data'
-import { OneSkyApiUrl } from './constants'
-import { getHash } from './auth'
+import { OneSkyApiUrl, PollingIntervalMs } from './constants'
+import { addAuthInfo } from './auth'
+
+type FileUploadResponse = {
+  meta: { status: number }
+  data: {
+    name: string
+    import: { id: number }
+  }
+}
 
 function validateInputs() {
   const publicKey = core.getInput('publicKey', { required: true })
@@ -29,8 +37,79 @@ function validateInputs() {
   }
 }
 
+type ImportProcessStatusResponse = {
+  meta: {
+    status: number
+    message: string
+  }
+  data: {
+    status: 'completed' | 'in-progress' | 'failed'
+  }
+}
+async function waitForImportFileProcess({
+  projectId,
+  fileUploadResponse,
+  privateKey,
+  publicKey,
+}: {
+  projectId: string
+  fileUploadResponse: FileUploadResponse
+  privateKey: string
+  publicKey: string
+}) {
+  const { name } = fileUploadResponse.data
+  const { id } = fileUploadResponse.data.import
+  const importUrl = `${OneSkyApiUrl}/projects/${projectId}/import-tasks/${id}?`
+
+  return new Promise((resolve, reject) => {
+    const verify = async () => {
+      try {
+        const url = addAuthInfo({
+          url: importUrl,
+          privateKey,
+          publicKey,
+        })
+        console.log(`Checking import status of ${name} file, importId: ${id}`)
+        const response = await fetch(url)
+        const json: ImportProcessStatusResponse = await response.json()
+        // if request isn't 2xx, it has failed
+        if (!json.meta.status.toString().startsWith('2')) {
+          reject(
+            new Error(
+              `Failed to verify status of file with importId: ${id}. Status code response is ${json.meta.status}, error message: "${json.meta.message}"`
+            )
+          )
+        }
+        const { data } = json
+        if (data.status === 'in-progress') {
+          console.log(`Status: in-progress, rechecking in approximately ${PollingIntervalMs / 1000} seconds...`)
+          // return, next interval will check again
+          setTimeout(verify, PollingIntervalMs)
+          return
+        }
+        if (data.status === 'completed') {
+          console.log(`${name} file processed successfully!`)
+          resolve()
+          return
+        }
+        if (data.status === 'failed') {
+          console.log(`Failed to process ${name}, importId: ${id}`)
+          // failed to process
+          throw Error(`ImportId ${id} failed to be processed`)
+        }
+        throw new Error(`Unsupported status from OneSky Import API: ${data.status}`)
+      } catch (e) {
+        reject(e)
+      }
+    }
+    setTimeout(verify, PollingIntervalMs)
+  })
+}
+
 ;(async () => {
   try {
+    console.log('Starting OneSky upload file action.')
+
     const {
       publicKey,
       filename,
@@ -42,14 +121,13 @@ function validateInputs() {
       filepath,
     } = validateInputs()
 
-    const timestamp = Math.floor(Date.now() / 1000)
-    const hash = getHash(timestamp, privateKey)
-    const queryString = `api_key=${encodeURIComponent(publicKey)}&timestamp=${timestamp}&dev_hash=${encodeURIComponent(
-      hash
-    )}`
-    const url = `${OneSkyApiUrl}/projects/${projectId}/files?${queryString}`
+    const requestUrl = addAuthInfo({
+      url: `${OneSkyApiUrl}/projects/${projectId}/files?`,
+      privateKey,
+      publicKey,
+    })
 
-    const path = resolve(__dirname, `${filepath}/${filename}`)
+    const path = join(process.env.GITHUB_WORKSPACE!, filepath, filename)
     console.log(`reading the resource file from ${path}`)
     const fileString = await promisify(readFile)(path, 'utf8')
 
@@ -65,12 +143,20 @@ function validateInputs() {
     form.append('locale', locale)
     form.append('is_keeping_all_strings', isKeepingAllStrings)
 
-    console.log(`posting file to ${url}`)
-    const response = await fetch(url, { method: 'POST', body: form })
-    // using text because the json they send on error is not valid :(
-    const json = await response.text()
-    console.log(json)
+    console.log(`posting file to OneSkyApp`)
+    const response = await fetch(requestUrl, { method: 'POST', body: form })
+
+    const fileUploadResponse: FileUploadResponse = await response.json()
+    console.log(
+      `Successfully started upload of ${filename}. Checking through the Import api the state of the upload in approximately ${
+        PollingIntervalMs / 1000
+      } seconds...`
+    )
+
+    await waitForImportFileProcess({ projectId, fileUploadResponse, privateKey, publicKey })
+    console.log(`${filename} uploaded and imported successfully.`)
   } catch (e) {
-    core.setFailed(`Action failed with the error ${e.message}`)
+    console.error(e)
+    core.setFailed(`Action failed with the error: ${e.message}`)
   }
 })()
