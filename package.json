@@ -8,7 +8,7 @@
     "email": "gonzalo.n.delia@gmail.com"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "ncc build src/index.ts -m -o lib --no-source-map-register",
     "format": "prettier --write src/**/*.ts",
     "lint": "eslint . --fix --ext .ts --max-warnings 0"
   },

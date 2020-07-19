@@ -5,7 +5,7 @@ module.exports = {
     'pre-commit': tasks([
       'lint-staged',
       'rm -rf lib',
-      'ncc build src/index.ts -m -o lib --no-source-map-register',
+      'npm run build',
       'git add lib'
     ])
   }
