@@ -13,7 +13,6 @@ export const addAuthInfo = ({
   privateKey: string
   publicKey: string
 }): string => {
-  console.log('calculating api_key...')
   const timestamp = Math.floor(Date.now() / 1000)
   const hash = getHash(timestamp, privateKey)
   const queryString = `api_key=${encodeURIComponent(publicKey)}&timestamp=${timestamp}&dev_hash=${encodeURIComponent(

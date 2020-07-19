@@ -4,7 +4,7 @@ import { promisify } from 'util'
 import { join } from 'path'
 import { readFile } from 'fs'
 import FormData from 'form-data'
-import { OneSkyApiUrl } from './constants'
+import { OneSkyApiUrl, PollingIntervalMs } from './constants'
 import { addAuthInfo } from './auth'
 
 type FileUploadResponse = {
@@ -57,7 +57,6 @@ async function waitForImportFileProcess({
   privateKey: string
   publicKey: string
 }) {
-  const POLLING_INTERVAL_MS = 8000
   const { name } = fileUploadResponse.data
   const { id } = fileUploadResponse.data.import
   const importUrl = `${OneSkyApiUrl}/projects/${projectId}/import-tasks/${id}?`
@@ -83,9 +82,9 @@ async function waitForImportFileProcess({
         }
         const { data } = json
         if (data.status === 'in-progress') {
-          console.log('Status: in-progress, rechecking in approximately 8 seconds...')
+          console.log(`Status: in-progress, rechecking in approximately ${PollingIntervalMs / 1000} seconds...`)
           // return, next interval will check again
-          setTimeout(verify, POLLING_INTERVAL_MS)
+          setTimeout(verify, PollingIntervalMs)
           return
         }
         if (data.status === 'completed') {
@@ -103,7 +102,7 @@ async function waitForImportFileProcess({
         reject(e)
       }
     }
-    setTimeout(verify, POLLING_INTERVAL_MS)
+    setTimeout(verify, PollingIntervalMs)
   })
 }
 
@@ -149,7 +148,9 @@ async function waitForImportFileProcess({
 
     const fileUploadResponse: FileUploadResponse = await response.json()
     console.log(
-      `Successfully started upload of ${filename}. Checking through the Import api the state of the upload...`
+      `Successfully started upload of ${filename}. Checking through the Import api the state of the upload in approximately ${
+        PollingIntervalMs / 1000
+      } seconds...`
     )
 
     await waitForImportFileProcess({ projectId, fileUploadResponse, privateKey, publicKey })
