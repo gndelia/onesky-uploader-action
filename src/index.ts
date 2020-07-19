@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import fetch from 'node-fetch'
 import { promisify } from 'util'
-import { resolve } from 'path'
+import { join } from 'path'
 import { readFile } from 'fs'
 import FormData from 'form-data'
 import { OneSkyApiUrl } from './constants'
@@ -52,7 +52,7 @@ function validateInputs() {
     )}`
     const url = `${OneSkyApiUrl}/projects/${projectId}/files?${queryString}`
 
-    const path = resolve(`${filepath}/${filename}`)
+    const path = join(process.env.GITHUB_WORKSPACE!, filepath, filename)
     console.log(`reading the resource file from ${path}`)
     const fileString = await promisify(readFile)(path, 'utf8')
 
