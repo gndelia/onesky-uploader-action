@@ -128,7 +128,8 @@ async function waitForImportFileProcess({
     const response = await fetch(requestUrl, { method: 'POST', body: form })
 
     const fileUploadResponse: FileUploadResponse = await response.json()
-    console.log(`Successfully started upload of ${fileUploadResponse.name}`)
+    console.log(fileUploadResponse)
+    console.log(`Successfully started upload of ${filename}`)
     await waitForImportFileProcess({ projectId, fileUploadResponse, privateKey, publicKey })
     console.log(`${fileUploadResponse.name} uploaded and imported successfully.`)
   } catch (e) {
