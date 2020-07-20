@@ -1,6 +1,6 @@
 # OneSky File uploader
 
-![](https://github.com/gndelia/onesky-app-file-uploader-github-action/workflows/master%20checks/badge.svg)
+![](https://github.com/gndelia/onesky-app-file-uploader-github-action/workflows/build/badge.svg)
 
 This GitHub action allows you to upload a resource file to [OneSky](https://www.oneskyapp.com/) for its translation. you can execute this action whenever your resource file change, or periodically.
 

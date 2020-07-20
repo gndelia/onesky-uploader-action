@@ -1,4 +1,4 @@
-name: master checks
+name: build
 
 on:
  push:
