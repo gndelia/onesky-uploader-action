@@ -1,0 +1,52 @@
+name: master checks
+
+on:
+ push:
+    branches:
+      - master
+
+jobs:
+  style_check:
+    name: Code styling check
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
+      
+      - name: Install deps
+        run: npm ci
+      
+      - name: Check formatting
+        run: npm run style:check
+      
+      - name: Check Eslint
+        run: npm run lint:check
+  
+  build_check:
+    name: Checks typings and building
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+          registry-url: 'https://npm.pkg.github.com'
+      
+      - name: Install deps
+        run: npm ci
+
+      - name: build project
+        run: npm run build
