@@ -7,6 +7,7 @@ module.exports = {
       'rm -rf lib',
       'npm run build',
       'git add lib'
-    ])
+    ]),
+    'commit-msg': 'commitlint -E HUSKY_GIT_PARAMS'
   }
 }
