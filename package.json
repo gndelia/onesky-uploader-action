@@ -10,7 +10,9 @@
   "scripts": {
     "build": "ncc build src/index.ts -m -o lib --no-source-map-register",
     "format": "prettier --write src/**/*.ts",
-    "lint": "eslint . --fix --ext .ts --max-warnings 0"
+    "style:check": "prettier --check src/**/*.ts",
+    "lint": "eslint ./src --fix --ext .ts --max-warnings 0",
+    "lint:check": "eslint ./src/ --ext .ts --max-warnings 0"
   },
   "license": "MIT",
   "devDependencies": {
