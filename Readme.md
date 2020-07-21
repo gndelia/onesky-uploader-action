@@ -1,6 +1,6 @@
 # OneSky File uploader
 
-![](https://github.com/gndelia/onesky-app-file-uploader-github-action/workflows/build/badge.svg)
+![](https://github.com/gndelia/onesky-uploader-action/workflows/build/badge.svg)
 
 This GitHub action allows you to upload a resource file to [OneSky](https://www.oneskyapp.com/) for its translation. you can execute this action whenever your resource file change, or periodically.
 
@@ -61,7 +61,7 @@ Then use this action with the following example
 
 ```yml
 - name: real upload
-  uses: gndelia/onesky-app-file-uploader-github-action@v0.0.1
+  uses: gndelia/onesky-uploader-action@v0.0.1
   with:
     projectId: ${{ secrets.ONESKY_PROJECT_ID }} # projectId from OneSky stored in GH secrets
     publicKey: ${{ secrets.ONESKY_PUBLIC_KEY }} # publicKey from OneSky stored in GH secrets
