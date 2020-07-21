@@ -1,5 +1,5 @@
 {
-  "name": "onesky-app-file-uploader-github-action",
+  "name": "onesky-uploader-action",
   "version": "0.0.1",
   "description": "Github action that uploads a resource file to OneSky",
   "keywords": [
@@ -7,18 +7,18 @@
     "github action",
     "upload"
   ],
-  "main": "index.js",
+  "main": "lib/index.js",
   "author": {
     "name": "Gonzalo D'Elia",
     "email": "gonzalo.n.delia@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gndelia/onesky-app-file-uploader-github-action"
+    "url": "https://github.com/gndelia/onesky-uploader-action"
   },
-  "homepage": "https://github.com/gndelia/onesky-app-file-uploader-github-action",
+  "homepage": "https://github.com/gndelia/onesky-uploader-action",
   "bugs": {
-    "url": "https://github.com/gndelia/onesky-app-file-uploader-github-action/issues"
+    "url": "https://github.com/gndelia/onesky-uploader-action/issues"
   },
   "scripts": {
     "build": "ncc build src/index.ts -m -o lib --no-source-map-register",
