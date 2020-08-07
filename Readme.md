@@ -72,3 +72,30 @@ Then use this action with the following example
     fileformat: HIERARCHICAL_JSON
     isKeepingAllStrings: false
 ```
+
+
+You can trigger this action in your workflow as you like: For instance, periodically:
+
+```yml
+# This workflow is triggered once a week
+name: My once a week workflow
+on:
+  schedule:
+    - cron: '0 10 * * 1'
+jobs:
+  # Below the steps execution as the example above
+```
+
+or everytime your resource file changes
+```yml
+# This workflow is triggered once a week
+name: My workflow that fires everytime the resource file changes
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - path/to/my/resources.json
+jobs:
+  # Below the steps execution as the example above
+```
