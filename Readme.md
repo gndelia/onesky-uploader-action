@@ -38,6 +38,10 @@ The input format from your translation file. [Check out the list of available fi
 
 If true, it will keep those strings that cannot be found in the uploaded file and existed before. If false, they will be deprecated. Defaults to `true`
 
+### `isAllowTranslationSameAsOriginal`
+
+This setting applies to translation upload, skip importing translations that are the same as source text if set to false. Keeping the translations that are the same as source text if set to true.
+
 ## Outputs
 
 None
