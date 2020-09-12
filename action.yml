@@ -27,7 +27,11 @@ inputs:
   isKeepingAllStrings:
     description: 'For strings that cannot be found in newly uploaded file with same file name, keep those strings unchange if set to true. Deprecate those strings if set to false. Notice that different files will not interfere each other in the same project. For example, with setting is_keeping_all_strings to false, uploading en2.po will not deprecate strings of previously uploaded file, en.po.'
     required: false
-    default: 'true'
+    default: true'
+  isAllowTranslationSameAsOriginal:
+    description: 'This setting applies to translation upload, skip importing translations that are the same as source text if set to false. Keeping the translations that are the same as source text if set to true.'
+    required: false
+    default: 'false'
 runs:
   using: 'node12'
   main: 'lib/index.js'
