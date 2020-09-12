@@ -24,6 +24,7 @@ function validateInputs() {
   const filepath = core.getInput('filepath', { required: true })
   const fileFormat = core.getInput('fileFormat')
   const isKeepingAllStrings = core.getInput('isKeepingAllStrings')
+  const isAllowTranslationSameAsOriginal = core.getInput('isAllowTranslationSameAsOriginal')
 
   return {
     publicKey,
@@ -32,6 +33,7 @@ function validateInputs() {
     filename,
     fileFormat,
     isKeepingAllStrings,
+    isAllowTranslationSameAsOriginal,
     filepath,
     locale,
   }
@@ -117,6 +119,7 @@ async function waitForImportFileProcess({
       projectId,
       fileFormat,
       isKeepingAllStrings,
+      isAllowTranslationSameAsOriginal,
       locale,
       filepath,
     } = validateInputs()
@@ -142,6 +145,7 @@ async function waitForImportFileProcess({
     form.append('file_format', fileFormat)
     form.append('locale', locale)
     form.append('is_keeping_all_strings', isKeepingAllStrings)
+    form.append('is_allow_translation_same_as_original', isAllowTranslationSameAsOriginal)
 
     console.log(`posting file to OneSkyApp`)
     const response = await fetch(requestUrl, { method: 'POST', body: form })
