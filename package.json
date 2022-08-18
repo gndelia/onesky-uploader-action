@@ -48,7 +48,7 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
-    "@actions/core": "^1.2.6",
+    "@actions/core": "^1.9.1",
     "form-data": "^3.0.0",
     "node-fetch": "^2.6.1"
   },
